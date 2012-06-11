@@ -1,0 +1,93 @@
+# Requirements and installation notes for the neotropics pipeline
+
+(1). Install the following Debian packages
+python-setuptools
+python-mysqldb
+python-biopython
+MySQL
+
+(2). Configure the MySQL database
+MySQL data are saved to the directory /var/lib/mysql on a regular Debian installation. If /var is mounted on a separate parition, there may not be enought space for savin all the database data uses by the neotropics pipeline. MySQL should ins such cases be reconfigured to store data in a place where there is enought space. In this example we will use the same partition as /home is mounted on. To that end, preform the following steps as root.
+
+- Stop the MySQL server
+
+	/etc/init.d/mysql stop
+
+
+- Move the directory "/var/lib/mysql" to "/home/mysql"
+
+	mv /var/lib/mysql/ /home/
+
+- Edit the file /etc/mysql/my.cnf, and change the line "datadir = /var/lib/mysql" to "datadir = /home/mysql"
+
+	vim /etc/mysql/my.cnf
+
+- Also change the values of the following variables to something appropriate:
+	
+	key_buffer      		= 32G	# Mod by MT
+	table_cache            	= 512   # Mod by MT.
+	sort_buffer_size        = 128M  # Added by MT. 
+	read_buffer_size        = 128M  # Added by MT.
+	query_cache_limit   	= 32M   # Mod. by MT.
+	query_cache_size        = 128M  # Mod. by MT.
+	query_cache_type        = 1     # Added by MT.
+
+
+
+- Start the MySQL server again.
+
+	/etc/init.d/mysql start
+
+
+### Chatalogue of life database ###
+- Download the latest version of the "Chatalogue of life" (under "2011 Annual Checklist database download: delimited text files with data import scripts") from this page http://www.catalogueoflife.org/services/
+
+	$ wget http://www.catalogueoflife.org/services/res/2011AC_baseschema_dump.zip
+	$ unzip 2011AC_baseschema_dump.zip
+
+NOTE: The file "2011AC_baseschema_dump/scripts/MySQL_import.sql" is created on a Windows system, why the PATH variables in the file has to be changed. This is a simple find-and-replace operation and can be preformed in for example vim:
+
+	$ vim 2011AC_baseschema_dump/scripts/MySQL_import.sql
+	  :%s/C:baseschema_dump/\/home\/mats\/projects\/databases\/col\/2011AC_baseschema_dump/gc
+
+- Install the database by accessin the MySQL database using the mysql monitor program.
+        
+	$ mysql -u root -p
+	mysql> source /home/mats/projects/databases/col/2011AC_baseschema_dump/scripts/MySQL_import.sql;
+
+### Neotropics pipeline database ###
+
+- Access the MySQL database using the mysql monitor program.
+
+	$ mysql -u root -p 
+
+- Create a new database called "neotropics_pipeline" and populate it with some data
+		
+	mysql> CREATE DATABASE neotropics_pipeline;
+	mysql> SOURCE /home/mats/projects/neotropis/gis/country_polygons.sql;
+	mysql> LOAD DATA INFILE '/home/mats/projects/neotropis/gis/country_polygons.txt' INTO TABLE country_polygons; # This should be included in the previous *.sql file lateron. A "root" directory for the pipeline has to be set first.
+		
+### Create a user and grant privealages ###
+
+	mysql> CREATE USER 'neo'@'localhost' IDENTIFIED BY 'tropics';
+	mysql> GRANT ALL ON icol2011ac26Jul.* TO 'neo'@'localhost' IDENTIFIED BY 'tropics';
+	mysql> GRANT ALL ON neotropics_pipeline.* TO 'neo'@'localhost' IDENTIFIED BY 'tropics';
+
+### Environmental stuff
+
+Add the following line to ~/.bashrc	# Probably not nessesary anymore
+	
+	export  PYTHONPATH=$PYTHONPATH:/[PATH TO WHERE THE NEOTROPICS PIPLINE IS INSTALLED]/lib
+
+### Dev notes ###
+LOAD DATA INFILE '/home/mats/projects/neotropis/gis/country_polygons.txt' INTO TABLE country_polygons;
+
+INSTALL MYSQL node0: yum install mysql-server mysql mysql-devel
+yum install MySQL-python
+
+datadir=/state/partition2/matstopel
+
+Split the table "occurrence_records" in the gbif database is country specific tables. Use the script "bin/split_occurrence_record.py" to generate the file "generate_country_code_tables.sql". Then do:
+
+	$ mysql -u root -p gbif < generate_country_code_tables.sql
+
