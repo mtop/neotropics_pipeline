@@ -1,2 +1,9 @@
 neotropics_pipeline
 ===================
+
+bin/	Contains scripts for manipulating/preparing data etc.
+lib/	Holds all modules of the pipeline
+mysql/	*.sql files and data
+
+neotropics_pipeline.py	- Main script for the pipeline
+neotropis.cfg			- Configuration file for an analysis
