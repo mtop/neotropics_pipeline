@@ -30,7 +30,31 @@ def additional_species(ISO_code_list, species_list, raw_species_list, polygon):
 		cur.execute("SELECT taxon_name_id, longitude, latitude FROM occurrence_record_%s" % code)
 		additional_species_list = cur.fetchall()
 		cur.close()
-	return remove_redundant(additional_species_list, species_list, raw_species_list, polygon)
+	return remove_redundant_FIRST_REINCARNATION(additional_species_list, species_list, raw_species_list, polygon)
+
+
+def remove_redundant_FIRST_REINCARNATION(additional_species_list, species_list, raw_species_list, polygon):
+	for record in additional_species_list:
+		# Test if this species is already logged for donwstreame analyses
+		if record in species_list:
+			continue
+		else:
+			# Test if including of this record will reach the
+			# cutoff value (which has to be >0) for inclusion. 
+			if int(raw_species_list.count(record[0])) == int(uid.occurrence_nr)-1 and int(uid.occurrence_nr) > 0:
+				# Test if the occurrence record has longitude data
+				if record[1] != None:
+					if pip(polygon, record[1], record[2]) == True:
+						print "###  Match   ###"            # Devel.
+						species_list.append(record)
+			# ...and so on. ADD MORE TESTS!!!
+			if int(raw_species_list.count(record[0])) > int(uid.occurrence_nr) and int(uid.occurrence_nr) > 0:
+				# Test if the occurrence record has longitude data
+				if record[1] != None:
+					if pip(polygon, record[1], record[2]) == True:
+						print "###  Match   ###"            # Devel.
+						raw_species_list.append(record)
+
 
 
 ### Add non redundant species_id's to "species_list"
