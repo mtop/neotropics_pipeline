@@ -1,59 +1,41 @@
 #!/usr/bin/env python
 
-
-#import ConfigParser
-#from PointInPolygon import pip		# (polygon, x, y)
-#import PointInPolygon
-#from CountryInPolygon import cip		# (polygon, iso_code)
-#import CountryInPolygon
-##from PolygonInCountry import pic 	# (polygon)
-#import PolygonInCountry
-#import UserInput
+import UserInput
 import Countries
+import QueryGBIF
+import Filters
 
-
-c = Countries.all_species()
-print c[0]
-print c[1]
-print Countries.some_species(c[1])
-
-
-'''
 uid = UserInput.Data()
-all_species_in_country_list = []
-some_species_in_country_list = []
 
-""" 	Identify countries from where all species 
-		should be included in downstream analyses.
+"""     For each user defined polygon, Identify 
+		countries from where all species should 
+		be included in downstream analyses,
+		and countries where only some species 
+		should be included.
 """
 for polygon in uid.user_polygons.split(':'):
-	for iso_code in PolygonInCountry.get_iso():
-		the_test = CountryInPolygon.cip(polygon, iso_code)
-		if the_test == True:
-#			print iso_code[0]		# Devel.
-			all_species_in_country_list.append(iso_code[0])
-#			print country_list		# Devel.
-		elif the_test == None:
-			some_species_in_country_list.append(iso_code[0])
+	c_all = Countries.all_species(polygon)				# Working
+	c_some = Countries.some_species(c_all[1])			# Working
+	#print c_all[0]										# Devel.
+	#print c_some										# Devel.
 
-print "all_species_in_country_list = %s" % all_species_in_country_list
-print "some_species_in_country_list = %s" % some_species_in_country_list
+	#c_all = ['IS']										# Devel.
+	""" Create a list of all species found in a 
+		user defined polygon """
+	raw_species_list = QueryGBIF.qgd(c_all[0])			# Working
+#	print str(raw_species_list)							# Devel.
+#	print raw_species_list.count(2038894)				# Devel. 
+	print "raw_species_list contains %s records" % len(raw_species_list)
+#	Filters.occurrence_nr(raw_species_list)				# Working	
+	print "species_list contains %s records" % len(Filters.occurrence_nr(raw_species_list))		# Devel.
 
 
-""" 	Check if the polygon is only part of a country
- 		Returns a list of countries from where collecions 
- 		should be tested using "pip".
-"""
-print "#### Now in second function ####"	# Devel.
-for polygon in uid.user_polygons.split(':'):
-	print polygon		# Devel.
-	second_test =  PolygonInCountry.pic(polygon)
-	print second_test	# Devel.
-	if second_test != None and second_test not in some_species_in_country_list:
-		some_species_in_country_list.append(second_test)
-#	for country in 
+	#code = 'IS'										# Devel.
+	#print QueryGBIF.qgd(code)								# Devel.
+	#print QueryGBIF.raw_species_list(code)			# Devel.
 
-print "some_species_in_country_list is now = %s" % some_species_in_country_list		# Devel.
-#print some_species_in_country_list		# Devel.
+	#print c[0]	# Devel
+	#print c[1]	# Devel
+	#print Countries.some_species(c[1])	# Devel
 
-'''
+

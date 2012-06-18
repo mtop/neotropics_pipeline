@@ -19,3 +19,4 @@ class Data:
 		config.read('neotropis.cfg')
 
 		self.user_polygons = config.get('Polygons', 'user_polygons')
+		self.occurrence_nr = config.get('Filters', 'occurrence_nr')

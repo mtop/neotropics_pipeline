@@ -29,23 +29,23 @@ uid = UserInput.Data()
 		defined polygon. Records from these countries should 
 		be filtered using the "PointInPolygon.pip" function.
 """
-def all_species():
+def all_species(polygon):
 	all_species_in_country_list = []
 	some_species_in_country_list = []
-	for polygon in uid.user_polygons.split(':'):
-		for iso_code in PolygonInCountry.get_iso():
-			the_test = CountryInPolygon.cip(polygon, iso_code)
-			if the_test == True:
-				all_species_in_country_list.append(iso_code[0])
-			elif the_test == None:
-				some_species_in_country_list.append(iso_code[0])
+#	for polygon in uid.user_polygons.split(':'):		# Splitting the polygons has been moved to "neotropis_pipeline.py"
+	for iso_code in PolygonInCountry.get_iso():
+		the_test = CountryInPolygon.cip(polygon, iso_code)
+		if the_test == True:
+			all_species_in_country_list.append(iso_code[0])
+		elif the_test == None:
+			some_species_in_country_list.append(iso_code[0])
 	return all_species_in_country_list, some_species_in_country_list
 #print "all_species_in_country_list = %s" % all_species_in_country_list			# Devel.
 #print "some_species_in_country_list = %s" % some_species_in_country_list		# Devel.
 
 
 
-"""     Check if the one of the user-defined polygon are 
+"""     Check if one of the user-defined polygon are 
 		only part of a country (fully enclosed by a country 
 		polygon) and then appends these counties to the 
 		"some_species_in_country_list". Records from these 
