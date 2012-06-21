@@ -4,6 +4,7 @@ import UserInput
 import Countries
 import QueryGBIF
 import Filters
+import SpeciesInPolygon as sip
 
 uid = UserInput.Data()
 
@@ -22,6 +23,10 @@ for polygon in uid.user_polygons.split(':'):
 	""" Create a list of all species found in a 
 		user defined polygon """
 	raw_species_list = QueryGBIF.qgd(c_all[0])			# Working
-	print "raw_species_list contains %s records" % len(raw_species_list)	# Devel.
-	print "species_list contains %s records" % len(Filters.occurrence_nr(raw_species_list))		# Devel.
+	species_list = Filters.occurrence_nr(raw_species_list)
+
+#	print "raw_species_list contains %s records" % len(raw_species_list)	# Devel.
+#	print "species_list contains %s records" % len(Filters.occurrence_nr(raw_species_list))		# Devel.
+
+	sip.additional_species(c_some, species_list, raw_species_list, polygon)
 
