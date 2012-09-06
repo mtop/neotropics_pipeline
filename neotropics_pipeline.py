@@ -83,7 +83,7 @@ def write_output_file(species_list, sufix):
 """
 
 if __name__ == '__main__':
-	c_all = ['NO']
+	c_all = ['AD']
 	c_some = ['NO']
 #	c_all = ['AD', 'AE', 'AF', 'AG', 'AI', 'AL', 'AM', 'IS', 'NO']
 #	generate_country_lists()
