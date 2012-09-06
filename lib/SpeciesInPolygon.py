@@ -40,6 +40,7 @@ def additional_species(ISO_code_list, species_list, raw_species_list, polygon):
 #	return remove_redundant_FIRST_REINCARNATION(additional_species_list, species_list, raw_species_list, polygon)
 	remove_redundant_FIRST_REINCARNATION(additional_species_list, species_list, raw_species_list, polygon)	# Devel.
 	print "species_list: %s" % len(species_list)						# Devel.
+	print species_list
 
 
 def remove_redundant_FIRST_REINCARNATION(additional_species_list, species_list, raw_species_list, polygon):

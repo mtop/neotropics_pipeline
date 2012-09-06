@@ -20,3 +20,12 @@ class Data:
 
 		self.user_polygons = config.get('Polygons', 'user_polygons')
 		self.occurrence_nr = config.get('Filters', 'occurrence_nr')
+
+
+class Misc_system:
+	def __init__(self):
+		import ConfigParser
+		config = ConfigParser.RawConfigParser()
+		config.read('neotropis.cfg')
+
+		self.num_CPU = config.get('Multiprocesses', 'num_CPU')

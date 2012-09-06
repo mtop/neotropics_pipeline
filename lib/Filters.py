@@ -34,3 +34,6 @@ def occurrence_nr(raw_species_list):
 	else:
 		return raw_species_list
 
+#def organism_group():
+	
+
