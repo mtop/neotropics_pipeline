@@ -20,6 +20,7 @@ class Data:
 
 		self.user_polygons = config.get('Polygons', 'user_polygons')
 		self.occurrence_nr = config.get('Filters', 'occurrence_nr')
+		self.taxon = config.get('Filters', 'taxon')
 
 
 class Misc_system:
