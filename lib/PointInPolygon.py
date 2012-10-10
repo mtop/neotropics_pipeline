@@ -16,7 +16,7 @@
 
 
 # determine if a point is inside a given polygon or not
-# Polygon is a list of (x,y) pairs.
+# Polygon is a list of Longitude/Latitude (x,y) pairs.
 # Code modified from  http://www.ariel.com.au/a/python-point-int-poly.html
 def pip(poly, x, y):
 	x = float(x)
