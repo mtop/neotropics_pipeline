@@ -24,16 +24,17 @@ uid = UserInput.Data()
 	'occurrence_nr' 
 """
 def occurrence_nr(raw_species_list):
-	# Test if this filter should be used
+	# Only include species that have been recorded
+	# in the polygon >= times what is indicated in
+	# 'occurrence_nr'.
+	# First tests if this filter should be used:
 	if uid.occurrence_nr != 0:
 		species_list = []
 		for record in set(raw_species_list):
 			if int(raw_species_list.count(record)) >= int(uid.occurrence_nr) and record not in species_list:
+				# Add the number of occurrences of a species to the species list
+				record = (record, int(raw_species_list.count(record)))
 				species_list.append(record)
 		return species_list
 	else:
 		return raw_species_list
-
-#def organism_group():
-	
-
