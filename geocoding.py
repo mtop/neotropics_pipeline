@@ -40,6 +40,9 @@ class Polygons(object):
 	# Object that contains the polygons
 	def __init__(self):
 		self.polygonFile = options.polygons[0]
+		self.polygonNames = []
+		for polygon in self.getPolygons():
+			self.setPolygonNames(polygon[0])
 
 	def getPolygons(self):
 		f = open(self.polygonFile)
@@ -49,8 +52,17 @@ class Polygons(object):
 				break
 			splitline = line.split(':')
 			name = splitline[0]
+			self.setPolygonNames(name)
+#			polygon = splitline[1].lstrip().rstrip('\n')
 			polygon = self.prepare_poly(splitline[1])
 			yield name, polygon
+
+	def setPolygonNames(self, name):
+		if name not in self.polygonNames:
+			self.polygonNames.append(name)
+
+	def getPolygonNames(self):
+		return self.polygonNames
 
 	def prepare_poly(self, poly):
 		poly = poly.split(' ')
@@ -60,15 +72,18 @@ class Polygons(object):
 				pass
 			else:
 				mod = ('%s') % node
-				poly_2.append(mod)
+				poly_2.append(mod.rstrip('\n'))
 		return poly_2
 									
 
 
 class Localities(object):
-	# Objec that contains the locality data,
+	# Object that contains the locality data,
 	def __init__(self):
 		self.localityFile = options.localities[0]
+		self.speciesNames = []
+		for name in self.getLocalities():
+			self.setSpeciesNames(name[1])
 
 	def getLocalities(self):
 		f = open(self.localityFile)
@@ -82,9 +97,18 @@ class Localities(object):
 			splitline = line.split()
 			numbers = splitline[0]
 			species = splitline[1] + ' ' + splitline[2]
+			self.setSpeciesNames(species)
 			longitude = splitline[3]
 			latitude = splitline[4]
 			yield numbers, species, longitude, latitude
+
+	def setSpeciesNames(self, name):
+		if name not in self.speciesNames:
+			self.speciesNames.append(name)
+
+	def getSpeciesNames(self):
+		return self.speciesNames
+		
 
 
 def pointInPolygon(poly, x, y):
@@ -94,27 +118,13 @@ def pointInPolygon(poly, x, y):
 	# Code modified from  http://www.ariel.com.au/a/python-point-int-poly.html
 
 	x = float(x)
-#	print x     		# Devel.
 	y = float(y)
-#	poly = prepare_poly(poly)
-#	print poly			# Devel.
-#	print poly[0]		# Devel.
 	n = len(poly)
 	inside = False
-	p1x = float('%s' % poly.split(',')[0])
-#	print type(p1x)     # Devel.
-	print p1x           # Devel.
-	print poly.split(',')[1]	# Devel.
-	p1y = float('%s' % poly.split(',')[1])
-#   print type(p1y)     # Devel.
-#   print p1y           # Devel.
+	p1x,p1y = poly[0].split(',')
 	for i in range(n+1):
 		p2x = float('%s' % poly[i % n].split(',')[0])
-#       print type(p2x) # Devel.
-#       print p2x       # Devel.
 		p2y = float('%s' % poly[i % n].split(',')[1])
-#       print type(p2y) # Devel.
-#       print p2y       # Devel.
 		if y > min(p1y,p2y):
 			if y <= max(p1y,p2y):
 				if x <= max(p1x,p2x):
@@ -125,29 +135,48 @@ def pointInPolygon(poly, x, y):
 		p1x,p1y = p2x,p2y
 	return inside
 
-def prepare_poly(poly):
-	poly = poly.split(' ')
-	poly_2 = []
-	for node in list(poly):
-		mod = ('%s') % node
-		poly_2.append(mod)
-	return poly_2
+class Result(object):
+	def __init__(self, polygons, localities):
+		self.polygonNames =  polygons.getPolygonNames()
+		self.speciesNames = localities.getSpeciesNames()
+		# Create a dictionary where each key corresponds to 
+		# a speceis names, and the values are initially lists
+		# of zeros of the same length as the number of polygons. 
+		self.emptyList = []
+		for i in range(len(self.polygonNames)):
+			self.emptyList.append("0")
+		self.result = {}
+		for name in self.speciesNames:
+			self.result[name] = self.emptyList
+
+	def setResult(self, speciesName, polygonName):
+		pass
+		
+	
+
 
 def main():
 	# Read the locality data and test if the coordinates 
 	# are located in any of the polygons.
 	polygons = Polygons()
 	localities = Localities()
-	for polygon in polygons.getPolygons():
-#		print polygon[1]
-		for locality in localities.getLocalities():
-			print pointInPolygon(polygon[1], locality[2], locality[3])
+	result = Result(polygons, localities)
+	# For each locality record ...
+	for locality in localities.getLocalities():
+		# ... and for each polygon ...
+		for polygon in polygons.getPolygons():
+			# ... test if the locality record is found in the polygon.
+			# polygon[1] = species name, locality[2] = longitude, locality[3] = latitude
+			if pointInPolygon(polygon[1], locality[2], locality[3]) == True:
+				result.setResult(locality[1], polygon[0])
+
+#	print result.getResult()						# Devel.
 
 
 if __name__ == "__main__":
 	main()
 #	polygons = Polygons()
-#	for i in polygons.getPolygons():
+#	for i in polygons.getPolygonNames():
 #		print i
 	
 
